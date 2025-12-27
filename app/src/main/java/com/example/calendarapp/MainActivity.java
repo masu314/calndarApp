@@ -1,7 +1,10 @@
 package com.example.calendarapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +19,13 @@ public class MainActivity extends AppCompatActivity {
 
     private GridView calendarGrid;
     private ArrayList<Integer> dayList;
+    private Calendar calendar;
+    private int displayYear;
+
+    private int displayMonth;
+    private int displayYearMonth;
+
+    private TextView textYearMonth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +41,49 @@ public class MainActivity extends AppCompatActivity {
         //　カレンダーの枠を取得
         calendarGrid = findViewById(R.id.calendarGrid);
 
+        // 今日の年月日時を取得
+        calendar = Calendar.getInstance();
+        // 取得した年を取り出す
+        displayYear = calendar.get(Calendar.YEAR);
+        // 取得した月を取り出す
+        displayMonth = calendar.get(Calendar.MONTH) + 1;
+
+        // カレンダーの年月表示個所を取得
+        textYearMonth = findViewById(R.id.textYearMonth);
+        // 画面に年月を表示
+        textYearMonth.setText(displayYear + "年" + displayMonth + "月");
+
         // 日付リストを作成
         dayList = createDayList();
 
         // Adapterに日付リストを渡す
-        CalendarAdapter adapter = new CalendarAdapter(this, dayList);
+        CalendarAdapter adapter = new CalendarAdapter(this, dayList, displayYear, displayMonth);
         // カレンダーの枠にアダプターを設定
         calendarGrid.setAdapter(adapter);
+
+        // セルをタップしたときの処理
+        calendarGrid.setOnItemClickListener((parent, view, position, id) -> {
+            // 日付を取得
+            int displayDay = dayList.get(position);
+
+            // 空白マス (=0) は無視
+            if (displayDay == 0) return;
+
+            // AddEventActivityへ画面遷移
+            Intent intent = new Intent(this, AddEventActivity.class);
+            // 新しい画面に年月日を渡す
+            intent.putExtra("year", displayYear);
+            intent.putExtra("month", displayMonth);
+            intent.putExtra("day", displayDay);
+            startActivity(intent);
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 予定を書き戻した時に更新する
+        ((BaseAdapter) calendarGrid.getAdapter()).notifyDataSetChanged();
     }
 
 
@@ -45,16 +91,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Integer> createDayList() {
         ArrayList<Integer> list = new ArrayList<>();
 
-        // 今日の日時を取得
-        Calendar calendar = Calendar.getInstance();
-
-        // 今年を取得
-        int year = calendar.get(Calendar.YEAR);
-        // 今月を取得
-        int month = calendar.get(Calendar.MONTH);
-
         // カレンダーに今月の1日（月初）に設定
-        calendar.set(year, month, 1);
+        calendar.set(displayYear, displayMonth, 1);
 
         // 月初の曜日を取得
         int startDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);

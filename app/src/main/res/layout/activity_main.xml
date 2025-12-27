@@ -7,13 +7,32 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- 年月を表示する TextView -->
+    <TextView
+        android:id="@+id/textYearMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2025年12月"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- カレンダー本体（GridView） -->
     <GridView
         android:id="@+id/calendarGrid"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:numColumns="7"
-        android:verticalSpacing="8dp"
+        android:verticalSpacing="25dp"
         android:horizontalSpacing="8dp"
-        android:gravity="center"/>
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/textYearMonth"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

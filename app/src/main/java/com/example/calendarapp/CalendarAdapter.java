@@ -1,7 +1,10 @@
 package com.example.calendarapp;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +20,24 @@ public class CalendarAdapter extends BaseAdapter {
     private ArrayList<Integer> dayList;
     private LayoutInflater inflater;
 
+    private int displayYear;
+    private int displayMonth;
+
     private int todayYear;
     private int todayMonth;
     private int todayDay;
 
+    private int Year;
+    private int eventMonth;
+
 
     // コンストラクタ
-    public CalendarAdapter(Context context, ArrayList<Integer> dayList) {
+    public CalendarAdapter(Context context, ArrayList<Integer> dayList, int year, int month) {
         this.context = context;
         this.dayList = dayList;
         this.inflater = LayoutInflater.from(context);
+        displayYear = year;
+        displayMonth = month;
 
         // 今日の日時を取得
         Calendar today = Calendar.getInstance();
@@ -66,8 +77,10 @@ public class CalendarAdapter extends BaseAdapter {
             view = inflater.inflate(R.layout.calendar_cell, parent, false);
         }
 
-        // 日付表示用のTextViewを取得
+        // 日付表示欄を取得
         TextView dayText = view.findViewById(R.id.dayText);
+        // 予定表示欄を取得
+        TextView eventText = view.findViewById(R.id.eventText);
         // positionから日付を取り出す
         int day = dayList.get(position);
 
@@ -75,6 +88,8 @@ public class CalendarAdapter extends BaseAdapter {
         if (day == 0) {
             // 日付を表示しない
             dayText.setText("");
+            // 予定を表示しない
+            eventText.setVisibility(View.GONE);
             // 背景を設定しない
             view.setBackgroundColor(Color.TRANSPARENT);
         // 通常の日付マスの処理
@@ -89,8 +104,34 @@ public class CalendarAdapter extends BaseAdapter {
             } else {
                 view.setBackgroundColor(Color.TRANSPARENT);
             }
-        }
 
+            // 保存済みの予定を取得して表示
+            SharedPreferences prefs = context.getSharedPreferences("events", Context.MODE_PRIVATE);
+            String key = displayYear + "-" + displayMonth + "-" + day;
+            String events = prefs.getString(key, "");
+            Log.d("LOAD", "load = " + key + " : " + events);
+
+            if (events != null && !events.isEmpty()) {
+
+                // 改行で分割
+                String[] lines = events.split("\n");
+
+                // 最大2行まで表示
+                StringBuilder showText = new StringBuilder();
+                int max = Math.min(2, lines.length);
+                for (int i = 0; i < max; i++) {
+                    showText.append(lines[i]);
+                    if (i < max - 1) showText.append("\n");
+                }
+
+                // カレンダーセルへ表示
+                eventText.setText(showText.toString());
+                eventText.setVisibility(View.VISIBLE);
+
+            } else {
+                eventText.setVisibility(View.GONE);
+            }
+        }
         return view;
     }
 
@@ -100,7 +141,7 @@ public class CalendarAdapter extends BaseAdapter {
         Calendar cal = Calendar.getInstance();
         // 今年の年と今月の月と今日の日付と一致していたら true を返す
         return cal.get(Calendar.YEAR) == todayYear
-                && cal.get(Calendar.MONTH) == todayMonth
+                && (cal.get(Calendar.MONTH)) == todayMonth
                 && day == todayDay;
     }
 }
