@@ -7,19 +7,77 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- 年月を表示する TextView -->
-    <TextView
-        android:id="@+id/textYearMonth"
+    <!-- 前年ボタン -->
+    <Button
+        android:id="@+id/btnPrevYear"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="2025年12月"
+        android:text="@string/prev_month_year"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/textYear"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/textYear"
+        android:layout_marginTop="8dp"/>
+
+    <!-- 翌年ボタン -->
+    <Button
+        android:id="@+id/btnNextYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/next_month_year"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/textYear"
+        app:layout_constraintStart_toEndOf="@id/textYear"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <!-- 年表示-->
+    <TextView
+        android:id="@+id/textYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/btnNextYear"
+        app:layout_constraintBottom_toBottomOf="@id/btnPrevYear"
+        app:layout_constraintStart_toEndOf="@id/btnPrevYear"
+        app:layout_constraintEnd_toStartOf="@id/btnNextYear"
+        android:gravity="center" />
+
+
+    <!-- 前月ボタン -->
+    <Button
+        android:id="@+id/btnPrevMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/prev_month_year"
+        app:layout_constraintTop_toBottomOf="@id/textYear"
+        app:layout_constraintStart_toStartOf="@id/btnPrevYear"
+        android:layout_marginTop="8dp" />
+
+    <!-- 翌月ボタン -->
+    <Button
+        android:id="@+id/btnNextMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/next_month_year"
+        app:layout_constraintTop_toBottomOf="@id/textYear"
+        app:layout_constraintEnd_toEndOf="@id/btnNextYear"
+        android:layout_marginTop="8dp" />
+
+
+    <!-- 月表示 -->
+    <TextView
+        android:id="@+id/textMonth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@id/btnPrevMonth"
+        app:layout_constraintBottom_toBottomOf="@id/btnPrevMonth"
+        app:layout_constraintStart_toEndOf="@id/btnPrevMonth"
+        app:layout_constraintEnd_toStartOf="@id/btnNextMonth"
+        android:gravity="center"/>
 
     <!-- カレンダー本体（GridView） -->
     <GridView
@@ -30,9 +88,10 @@
         android:verticalSpacing="25dp"
         android:horizontalSpacing="8dp"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/textYearMonth"
+        app:layout_constraintTop_toBottomOf="@id/textMonth"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:layout_marginTop="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

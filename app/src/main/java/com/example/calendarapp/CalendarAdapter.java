@@ -27,9 +27,6 @@ public class CalendarAdapter extends BaseAdapter {
     private int todayMonth;
     private int todayDay;
 
-    private int Year;
-    private int eventMonth;
-
 
     // コンストラクタ
     public CalendarAdapter(Context context, ArrayList<Integer> dayList, int year, int month) {
@@ -99,7 +96,7 @@ public class CalendarAdapter extends BaseAdapter {
             dayText.setTextColor(Color.BLACK);
 
             // 今日かどうかを判定
-            if (isToday(day)) {
+            if (isToday(day) ) {
                 view.setBackgroundColor(Color.parseColor("#FFCDD2")); // 薄い赤
             } else {
                 view.setBackgroundColor(Color.TRANSPARENT);
@@ -137,11 +134,9 @@ public class CalendarAdapter extends BaseAdapter {
 
     // 今日かどうかを判定する処理
     private boolean isToday(int day) {
-        // 今日の日時を取得
-        Calendar cal = Calendar.getInstance();
         // 今年の年と今月の月と今日の日付と一致していたら true を返す
-        return cal.get(Calendar.YEAR) == todayYear
-                && (cal.get(Calendar.MONTH)) == todayMonth
+        return displayYear == todayYear
+                && (displayMonth - 1) == todayMonth
                 && day == todayDay;
     }
 }
