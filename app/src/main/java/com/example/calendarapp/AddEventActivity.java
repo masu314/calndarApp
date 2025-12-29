@@ -138,9 +138,5 @@ public class AddEventActivity extends AppCompatActivity {
         }
 
         prefs.edit().putString(key, updated).apply();
-
-        // ★ログ出力で確認
-        Log.d("SAVE_EVENT", "Key = " + key);
-        Log.d("SAVE_EVENT", "Saved = " + updated);
     }
 }

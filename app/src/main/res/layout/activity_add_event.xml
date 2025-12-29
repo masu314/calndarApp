@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".AddEventActivity">
 
-    <!-- 日付表示 -->
+    <!-- 日付選択欄 -->
     <TextView
         android:id="@+id/txtDate"
         android:layout_width="0dp"
@@ -22,7 +22,7 @@
         android:layout_marginTop="24dp"
         android:gravity="center" />
 
-    <!-- 時間表示 -->
+    <!-- 時間選択欄 -->
     <TextView
         android:id="@+id/txtTime"
         android:layout_width="0dp"

@@ -2,6 +2,7 @@ package com.example.calendarapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private int displayMonth;
     private TextView textYear;
     private TextView textMonth;
+    private CalendarAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,14 @@ public class MainActivity extends AppCompatActivity {
 
         //　カレンダーの枠を取得
         calendarGrid = findViewById(R.id.calendarGrid);
+        // カレンダーのボタンを取得
+        Button btnPrevYear = findViewById(R.id.btnPrevYear);
+        Button btnNextYear = findViewById(R.id.btnNextYear);
+        Button btnPrevMonth = findViewById(R.id.btnPrevMonth);
+        Button btnNextMonth = findViewById(R.id.btnNextMonth);
+        // カレンダーの年月表示個所を取得
+        textYear = findViewById(R.id.textYear);
+        textMonth = findViewById(R.id.textMonth);
 
         // 今日の年月日時を取得
         calendar = Calendar.getInstance();
@@ -46,49 +56,32 @@ public class MainActivity extends AppCompatActivity {
         displayYear = calendar.get(Calendar.YEAR);
         // 取得した月を取り出す
         displayMonth = calendar.get(Calendar.MONTH) + 1;
-
-        // カレンダーの年月表示個所を取得
-        textYear = findViewById(R.id.textYear);
-        textMonth = findViewById(R.id.textMonth);
         // 画面に年月を表示
         textYear.setText(displayYear + "年");
         textMonth.setText(displayMonth + "月");
 
-        // カレンダーのボタンを取得
-        Button btnPrevYear = findViewById(R.id.btnPrevYear);
-        Button btnNextYear = findViewById(R.id.btnNextYear);
-        Button btnPrevMonth = findViewById(R.id.btnPrevMonth);
-        Button btnNextMonth = findViewById(R.id.btnNextMonth);
+        // 日付リストを作成
+        dayList = createDayList();
+        // Adapterに日付リストを渡す
+        adapter = new CalendarAdapter(this, dayList, displayYear, displayMonth);
+        // カレンダーの枠にアダプターを設定
+        calendarGrid.setAdapter(adapter);
+
+        // カレンダーの高さを調整し表示
+        calendarGrid.post(() -> {
+            int totalHeight = calendarGrid.getHeight();
+            int numRows = 6;
+            int calculatedHeight = totalHeight / numRows;
+
+            adapter.setCellHeight(calculatedHeight);
+            adapter.notifyDataSetChanged();
+        });
+
         // カレンダーのボタンのリスナーを設定
         btnPrevYear.setOnClickListener(v -> changeYear(-1));
         btnNextYear.setOnClickListener(v -> changeYear(1));
         btnPrevMonth.setOnClickListener(v -> changeMonth(-1));
         btnNextMonth.setOnClickListener(v -> changeMonth(1));
-
-        // 日付リストを作成
-        dayList = createDayList();
-
-        // Adapterに日付リストを渡す
-        CalendarAdapter adapter = new CalendarAdapter(this, dayList, displayYear, displayMonth);
-        // カレンダーの枠にアダプターを設定
-        calendarGrid.setAdapter(adapter);
-
-        // セルをタップしたときの処理
-        calendarGrid.setOnItemClickListener((parent, view, position, id) -> {
-            // 日付を取得
-            int displayDay = dayList.get(position);
-
-            // 空白マス (=0) は無視
-            if (displayDay == 0) return;
-
-            // AddEventActivityへ画面遷移
-            Intent intent = new Intent(this, AddEventActivity.class);
-            // 新しい画面に年月日を渡す
-            intent.putExtra("year", displayYear);
-            intent.putExtra("month", displayMonth);
-            intent.putExtra("day", displayDay);
-            startActivity(intent);
-        });
     }
 
     @Override
@@ -99,13 +92,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // 年変更用メソッド
+    // 表示用の年を変更
     private void changeYear(int offset) {
         displayYear += offset;
         updateCalendar();
     }
 
-    // 月変更用メソッド
+    // 表示用の月を変更
     private void changeMonth(int offset) {
         displayMonth += offset;
         if (displayMonth < 1) {
@@ -118,13 +111,13 @@ public class MainActivity extends AppCompatActivity {
         updateCalendar();
     }
 
-    // カレンダーの表示を更新する
+    // <>ボタンを押して年や月を変更したとき、カレンダーの表示を更新
     private void updateCalendar() {
         textYear.setText(displayYear + "年");
         textMonth.setText(displayMonth + "月");
         dayList = createDayList();
-        CalendarAdapter adapter = new CalendarAdapter(this, dayList, displayYear, displayMonth);
-        calendarGrid.setAdapter(adapter);
+        adapter.updateDayList(dayList, displayYear, displayMonth);
+        adapter.notifyDataSetChanged();
     }
 
     // 日付リストの作成

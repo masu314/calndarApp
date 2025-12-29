@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ public class CalendarAdapter extends BaseAdapter {
     private int todayYear;
     private int todayMonth;
     private int todayDay;
+    private int cellHeight = 0;
 
 
     // コンストラクタ
@@ -44,6 +48,11 @@ public class CalendarAdapter extends BaseAdapter {
         todayMonth = today.get(Calendar.MONTH);
         // 今日の日付を取得
         todayDay = today.get(Calendar.DAY_OF_MONTH);
+    }
+
+    // MainActivityから高さを設定
+    public void setCellHeight(int height) {
+        this.cellHeight = height;
     }
 
     // カレンダーのマスの数を取得
@@ -78,6 +87,24 @@ public class CalendarAdapter extends BaseAdapter {
         TextView dayText = view.findViewById(R.id.dayText);
         // 予定表示欄を取得
         TextView eventText = view.findViewById(R.id.eventText);
+
+        // カレンダーの1マスの高さと幅を設定
+        if (cellHeight > 0) {
+            view.setLayoutParams(new GridView.LayoutParams(
+                    GridView.LayoutParams.MATCH_PARENT,
+                    cellHeight
+            ));
+        }
+
+        // LinearLayout内のweightで日付と予定欄の比率を設定
+        LinearLayout layout = (LinearLayout) view;
+        LinearLayout.LayoutParams dayParams = (LinearLayout.LayoutParams) dayText.getLayoutParams();
+        dayParams.weight = 1;
+        dayText.setLayoutParams(dayParams);
+        LinearLayout.LayoutParams eventParams = (LinearLayout.LayoutParams) eventText.getLayoutParams();
+        eventParams.weight = 4; // 予定欄を大きく
+        eventText.setLayoutParams(eventParams);
+
         // positionから日付を取り出す
         int day = dayList.get(position);
 
@@ -95,7 +122,7 @@ public class CalendarAdapter extends BaseAdapter {
             dayText.setText(String.valueOf(day));
             dayText.setTextColor(Color.BLACK);
 
-            // 今日かどうかを判定
+            // 今日の日付に色を付ける
             if (isToday(day) ) {
                 view.setBackgroundColor(Color.parseColor("#FFCDD2")); // 薄い赤
             } else {
@@ -106,8 +133,8 @@ public class CalendarAdapter extends BaseAdapter {
             SharedPreferences prefs = context.getSharedPreferences("events", Context.MODE_PRIVATE);
             String key = displayYear + "-" + displayMonth + "-" + day;
             String events = prefs.getString(key, "");
-            Log.d("LOAD", "load = " + key + " : " + events);
 
+            // 日付に予定が登録されている場合
             if (events != null && !events.isEmpty()) {
 
                 // 改行で分割
@@ -121,13 +148,22 @@ public class CalendarAdapter extends BaseAdapter {
                     if (i < max - 1) showText.append("\n");
                 }
 
-                // カレンダーセルへ表示
+                // カレンダーの日付部部に表示
                 eventText.setText(showText.toString());
                 eventText.setVisibility(View.VISIBLE);
 
             } else {
                 eventText.setVisibility(View.GONE);
             }
+
+            // 日付をタップしたとき登録画面に遷移させる
+            view.setOnClickListener(v -> {
+                Intent intent = new Intent(context, AddEventActivity.class);
+                intent.putExtra("year", displayYear);
+                intent.putExtra("month", displayMonth);
+                intent.putExtra("day", day);
+                context.startActivity(intent);
+            });
         }
         return view;
     }
@@ -138,5 +174,12 @@ public class CalendarAdapter extends BaseAdapter {
         return displayYear == todayYear
                 && (displayMonth - 1) == todayMonth
                 && day == todayDay;
+    }
+
+    // カレンダーの年月日表示を更新する処理
+    public void updateDayList(ArrayList<Integer> newList, int year, int month) {
+        this.dayList = newList;
+        this.displayYear = year;
+        this.displayMonth = month;
     }
 }
